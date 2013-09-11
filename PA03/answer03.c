@@ -115,9 +115,38 @@ int * readIntegers(const char * filename, int * numberOfIntegers)
  * sort.
  *
  */
+void sorter(int *arr, int length, int *start, int size)
+{
+  int pivot = *start, *copy, count, curr, decr = 0, incr = 0;
+  copy = malloc(sizeof(int)*size);
+  for(count = 0; count < size; count++)
+    {
+      curr = *(start+count);
+      if(curr > pivot)
+        {
+          *(copy+ size - 1 + decr) = curr;
+          decr--;
+        }
+      if(curr < pivot)
+        {
+          *(copy+incr) = curr;
+          incr++;
+        }
+    }
+  for(count = 0; count < size - (incr-decr); count++)
+    *(copy+incr+count) = pivot;
+  for(count = 0; count < size; count++)
+    *(start+count)=*(copy+count);
+  free(copy);
+  if(incr>1)
+    sorter(arr, length, start, incr);
+  if(decr<-1)
+    sorter(arr, length, (start+size+decr), -decr);
+  
+}
 void sort(int * arr, int length)
 {
-    
+  sorter(arr, length, arr, length);
 }
 
 /**
