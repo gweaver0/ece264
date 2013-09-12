@@ -193,9 +193,20 @@ void sort(int * arr, int length)
  * }
  * return -1;
  */
+int searcher(int *arr, int start, int end, int key)
+{
+  int spot = (start + end)/2;
+  if(start==end&&*(arr+spot)!=key)
+    return -1;
+  if(*(arr+spot) == key)
+    return spot;
+  if(*(arr+spot) > key)
+    return searcher(arr, start, spot - 1, key);
+  return searcher(arr, spot + 1, end, key);
+}
 int search(int * arr, int length, int key)
 {
-    return -1;
+  return searcher(arr, 0, length - 1, key);
 }
 
 
