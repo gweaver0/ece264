@@ -121,11 +121,63 @@ void partitionAll(int value)
  *
  */
 
+int **incrpart(int n)
+{
+  int **thing;
+  int **temp;
+  int i, j, k, outer, inner, spot = 0;
+      
+  // Initializes MAXLENGTH^2  x (n+1) array with -1 in last row and 0 in all other rows
+  thing = malloc(MAXLENGTH*MAXLENGTH * sizeof(int *));
+  for(outer = 0; outer < MAXLENGTH*MAXLENGTH; outer++)
+  {
+    thing[outer] = malloc((n+1)*sizeof(int));
+    for(inner = 0; inner < n+1; inner++)
+    {
+      thing[outer][inner]= 0;
+    }  
+    if(outer == MAXLENGTH*MAXLENGTH - 1)
+        thing[outer][0]= -1;
+  }
+  
+  //escape case
+  if(n ==1)
+  {
+    thing[0][0] = 1;
+    thing[1][0] = -1;
+    return thing;
+  }
 
+  
+  //Row terminator is 0. Column terminator is -1. All other entries are meanignful.
+  for(i = 1; i < n; i++)
+    {
+      temp = incrpart(n-i);
+      for(j = 0; temp[j][0] !=-1; j++)
+      {
+        if(temp[j][0] > i)
+        {
+          thing[spot][0] = i;  
+          for(k = 0; temp[j][k] != 0; k++)
+          {
+          thing[spot][k+1] = temp[j][k];
+          }
+        spot++;
+        }
+      }
+      free(temp);
+    }
+  thing[spot][0] = n;
+  thing[spot+1][0] = -1;
+  return thing;
+} 
 void partitionIncreasing(int value)
 {
+  int **thing;
+  thing = incrpart(value);
   printf("partitionIncreasing %d\n", value);
-
+  printer(thing, value);
+  free(thing);
 }
 
 /*
