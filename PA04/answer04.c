@@ -15,270 +15,179 @@
 #include "pa04.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 
-
-/*
- * =================================================================
- * This function prints all partitions of a positive integer value
- * For example, if the value is 3:
- *
- * partitionAll 3
- * = 1 + 1 + 1
- * = 1 + 2
- * = 2 + 1
- * = 3
- */
-
-void printer(int **thing, int n)
+void printer(int *arr, int ind)
 {
-  int outer, inner=0;
-  for(outer = 0; thing[outer][0] != -1; outer++)
-  {
-    printf("= ");
-    for(inner = 0; thing[outer][inner] != 0; inner++)
-      {
-        if(inner == 0)
-          printf("%i ", thing[outer][inner]);
-        else
-          printf("+ %i ", thing[outer][inner]);
-      }
+  int count;
+  printf("= ");
+  for(count = 0; count < ind; count++)
+    {
+      if(count == 0)
+        printf("%i ", arr[count]);
+      else
+        printf("+ %i ", arr[count]);
+    }
     printf("\n");
-  }
 }
-int **part(int n)
+
+void part(int n, int *arr, int ind)
 {
-  int **thing;
-  int **temp;
-  int i, j, k, outer, inner, spot = 0;
-
-  // Initializes MAXLENGTH^2  x (n+1) array with -1 in last row and 0 in all other rows
-  thing = malloc(MAXLENGTH*MAXLENGTH * sizeof(int *));
-  for(outer = 0; outer < MAXLENGTH*MAXLENGTH; outer++)
+  int i;
+  if(n==0)
   {
-    thing[outer] = malloc((n+1)*sizeof(int));
-    for(inner = 0; inner < n+1; inner++)
-    {
-      thing[outer][inner]= 0;
-    }
-    if(outer == MAXLENGTH*MAXLENGTH - 1)
-        thing[outer][0]= -1;
+    printer(arr, ind);
+    return;
   }
-
-  //escape case
-  if(n ==1)
+  for(i = 1; i<=n; i++)
   {
-    thing[0][0] = 1;
-    thing[1][0] = -1;
-    return thing;
+    arr[ind] = i;
+    part(n-i, arr, ind+1);
   }
-  
-  //Row terminator is 0. Column terminator is -1. All other entries are meanignful.
-  for(i = 1; i < n; i++)
-    {
-      temp = part(n-i);
-      //thing[spot] = i + temp[j]
-      for(j = 0; temp[j][0] !=-1; j++)
-      {
-        thing[spot][0] = i;
-        for(k = 0; temp[j][k] != 0; k++)
-        {
-          thing[spot][k+1] = temp[j][k];
-        }
-        spot++;
-      }  
-      free(temp);
-    }
-  thing[spot][0] = n;
-  thing[spot+1][0] = -1;
-  return thing;
 }
 void partitionAll(int value)
 {
-  int **thing;
-  thing = part(value);
+  int *thing;
+  thing = malloc(value*sizeof(int));
   printf("partitionAll %d\n", value);
-  printer(thing, value);
+  part(value, thing, 0);
   free(thing);
-  
 }
-/*
- * =================================================================
- * This function prints the partitions that use increasing values.
- *
- * For example, if value is 5
- * 2 + 3 and
- * 1 + 4 are valid partitions
- *
- * 5 is a valid partition
- * 
- * 1 + 1 + 3 and
- * 2 + 1 + 2 and
- * 3 + 2 are invalid partitions.
- * 
- * The program should generate only valid partitions.  Do not
- * generates invalid partitions and checks validity before printing.
- *
- */
 
-int **incrpart(int n)
+void incrpart(int n, int *arr, int ind)
 {
-  int **thing;
-  int **temp;
-  int i, j, k, outer, inner, spot = 0;
-      
-  // Initializes MAXLENGTH^2  x (n+1) array with -1 in last row and 0 in all other rows
-  thing = malloc(MAXLENGTH*MAXLENGTH * sizeof(int *));
-  for(outer = 0; outer < MAXLENGTH*MAXLENGTH; outer++)
+  int i;
+  if(n==0)
   {
-    thing[outer] = malloc((n+1)*sizeof(int));
-    for(inner = 0; inner < n+1; inner++)
-    {
-      thing[outer][inner]= 0;
-    }  
-    if(outer == MAXLENGTH*MAXLENGTH - 1)
-        thing[outer][0]= -1;
+    printer(arr, ind);
+    return;
   }
-  
-  //escape case
-  if(n ==1)
+  for(i = 1; i<=n; i++)
   {
-    thing[0][0] = 1;
-    thing[1][0] = -1;
-    return thing;
-  }
-
-  
-  //Row terminator is 0. Column terminator is -1. All other entries are meanignful.
-  for(i = 1; i < n; i++)
+    if(ind==0||i>arr[ind-1])
     {
-      temp = incrpart(n-i);
-      for(j = 0; temp[j][0] !=-1; j++)
-      {
-        if(temp[j][0] > i)
-        {
-          thing[spot][0] = i;  
-          for(k = 0; temp[j][k] != 0; k++)
-          {
-          thing[spot][k+1] = temp[j][k];
-          }
-        spot++;
-        }
-      }
-      free(temp);
+      arr[ind] = i;
+      incrpart(n-i, arr, ind+1);
     }
-  thing[spot][0] = n;
-  thing[spot+1][0] = -1;
-  return thing;
-} 
+  }
+}
 void partitionIncreasing(int value)
 {
-  int **thing;
-  thing = incrpart(value);
+  int *thing;
+  thing = malloc(value*sizeof(int));
   printf("partitionIncreasing %d\n", value);
-  printer(thing, value);
+  incrpart(value, thing, 0);
+  free(thing);
+}
+
+void decrpart(int n, int *arr, int ind)                             
+{
+  int i;
+  if(n==0)
+  {
+    printer(arr, ind);
+    return;
+  }
+  for(i = n; i>=1; i--)
+  {
+    if(ind==0||i<arr[ind-1])
+    {
+      arr[ind] = i;
+      decrpart(n-i, arr, ind+1);
+    }
+  }  
+}
+void partitionDecreasing(int value)
+{
+  int *thing;
+  thing = malloc(value*sizeof(int));
+  printf("partitionDecreasing %d\n", value);
+  decrpart(value, thing, 0);
+  free(thing);
+}
+
+
+void oddpart(int n, int *arr, int ind)
+{
+  int i;
+  if(n==0)
+  {
+    printer(arr, ind);
+    return;
+  }
+  for(i = 1; i<=n; i++)
+  {
+    if((i%2)!=0)
+    {
+      arr[ind] = i;
+      oddpart(n-i, arr, ind+1);
+    }
+  }  
+}
+void partitionOdd(int value)
+{
+  int *thing;
+  thing = malloc(value*sizeof(int));
+  printf("partitionOdd %d\n", value);
+  oddpart(value, thing, 0);
+  free(thing);
+}
+
+void evpart(int n, int *arr, int ind)
+{
+  int i;                                                                       
+  if(n==0)                   
+  {
+    printer(arr, ind);
+    return;
+  }
+  for(i = 1; i<=n; i++)
+  {
+    if((i%2)==0)
+    {
+      arr[ind] = i;
+      evpart(n-i, arr, ind+1);
+    }
+  }
+}
+void partitionEven(int value)
+{
+  int *thing;
+  thing = malloc(value*sizeof(int));
+  printf("partitionEven %d\n", value);
+  evpart(value, thing, 0);
   free(thing);
 }
 
 /*
  * =================================================================
- * This function prints the partitions that use Decreasing values.
- *
- * For example, if value is 5
- * 3 + 2 and
- * 4 + 1 are valid partitions
- *
- * 5 is a valid partition
- * 
- * 1 + 1 + 3 and
- * 2 + 1 + 2 and
- * 2 + 3 are invalid partitions.
- * 
- * The program should generate only valid partitions.  Do not
- * generates invalid partitions and checks validity before printing.
- *
  */
 
-
-void partitionDecreasing(int value)
+void evopart(int n, int *arr, int ind) 
 {
-  printf("partitionDecreasing %d\n", value);
-  
-
+  int i;                                                 
+  if(n==0)
+  {                          
+    printer(arr, ind);
+    return;
+  }
+  for(i = 1; i<=n; i++)
+  {
+    if((i%2)!=(ind%2))
+    {
+      arr[ind] = i;
+      evopart(n-i, arr, ind+1); 
+    }
+  }
 }
-
-/*
- * =================================================================
- * This function prints odd number only partitions of a positive integer value
- * For example, if value is 5
- * 1 + 1 + 1 + 1 + 1 and
- * 1 + 3 + 1 are valid partitions
- *
- * 5 is a valid partition
- * 
- * 1 + 1 + 1 + 2 and
- * 2 + 1 + 2 and
- * 2 + 3 are invalid partitions.
- * 
- * The program should generate only valid partitions.  Do not
- * generates invalid partitions and checks validity before printing.
- */
-
-
-void partitionOdd(int value)
-{
-  printf("partitionOdd %d\n", value);
-  
-}
-
-/*
- * =================================================================
- * This function prints even number only partitions of a positive integer value
- * For example, if value is 8
- * 2 + 2 + 2 + 2and
- * 2 + 4 + 2 are valid partitions
- *
- * 8 is a valid partition
- *
- * 2 + 1 + 1 + 2 + 2and
- * 2 + 1 + 2 + 3and
- * 5 + 3 are invalid partitions.
- *
- * if the value is 5, there will be no result generated
- * 
- * The program should generate only valid partitions.  Do not
- * generates invalid partitions and checks validity before printing.
- */
-
-void partitionEven(int value)
-{
-  printf("partitionEven %d\n", value);
-
-}
-
-/*
- * =================================================================
- * This function prints alternate ood and even number partitions of a positive integer value. Each partition starts from and odd number, even number, ood number again, even number again...etc.
- *
- * For example, if value is 6
- * 1 + 2 + 1 + 2 and
- * 3 + 2 + 1 are valid partitions
- *
- * 6 is not a valid partition
- *
- * 2 + 1 + 1 + 2 and
- * 2 + 1 + 3and
- * 5 + 1 are invalid partitions.
- * 
- * The program should generate only valid partitions.  Do not
- * generates invalid partitions and checks validity before printing.
- */
-
-
 void partitionOddAndEven(int value)
 {
+  int *thing;
+  thing = malloc(value*sizeof(int));
   printf("partitionOddAndEven %d\n", value);
-  
+  evopart(value, thing, 0); 
+  free(thing);
 }
 
 /*
