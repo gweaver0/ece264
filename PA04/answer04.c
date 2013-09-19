@@ -30,48 +30,48 @@
  * = 3
  */
 
-void printer(int **thing)
+void printer(int **thing, int n)
 {
-  printf("Made it to printer function!");
-  int outer = 0, inner = 0;
-  for(outer = 0; thing[outer][inner] != -1; outer++)
+  int outer, inner=0;
+  for(outer = 0; thing[outer][0] != -1; outer++)
   {
     printf("= ");
-    for(inner = 0; thing[outer][inner]  != -1; inner++);
-    {
-      if(inner==0)
-        printf("%i ", thing[outer][0]);
-      else
-        printf("+ %i", thing[outer][inner]);
-    }
+    for(inner = 0; thing[outer][inner] != 0; inner++)
+      {
+        if(inner == 0)
+          printf("%i ", thing[outer][inner]);
+        else
+          printf("+ %i ", thing[outer][inner]);
+      }
     printf("\n");
   }
 }
 int **part(int n)
 {
-  int **thing[MAXLENGTH][MAXLENGTH];
+  int **thing;
+  thing = malloc(MAXLENGTH * sizeof(int *));
   int count, inner;
-  for(count = 0; count <= n; count++)
+  for(count = 0; count < MAXLENGTH; count++)
   {
-    for(inner = 0; inner <= n; inner++)
+    thing[count] = malloc((n+1)*sizeof(int));
+    for(inner = 0; inner < n-1; inner++)
     {
-      printf("%i\n",inner);
-      **thing[count][inner]= count + inner;
-      printf("%i\n",inner);
-      if(inner == n)
-        **thing[count][inner]= -1;
+      thing[count][inner]= count + inner+1;
     }
+    thing[count][n-1] = 0;
+    thing[count][n] = 0;
     if(count == n)
-        **thing[count][0]= -1;
+        thing[count][0]= -1;
   }
-  return **thing;
+  return thing;
 }
 void partitionAll(int value)
 {
   int **thing;
   thing = part(value);
   printf("partitionAll %d\n", value);
-  printer(thing);
+  printer(thing, value);
+  free(thing);
   
 }
 /*
