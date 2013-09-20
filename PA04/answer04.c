@@ -160,10 +160,6 @@ void partitionEven(int value)
   free(thing);
 }
 
-/*
- * =================================================================
- */
-
 void evopart(int n, int *arr, int ind) 
 {
   int i;                                                 
@@ -207,9 +203,40 @@ void partitionOddAndEven(int value)
  */
 
 
-
+int isPrime(int y)
+{
+  int x;
+  if(y ==1)
+    return 0;
+  for(x = 2; x < ((int)sqrt(y))+1; x++)
+  {
+    if((y%x)==0)
+      return 0;
+  }
+  return 1;
+}
+void ppart(int n, int *arr, int ind)
+{
+  int i;
+  if(n==0)
+  {
+    printer(arr, ind);
+    return;
+  }
+  for(i = 1; i<=n; i++)
+  {
+    if(isPrime(i))
+    {
+      arr[ind] = i;
+      ppart(n-i, arr, ind+1);
+    }
+  }  
+} 
 void partitionPrime(int value)
 {
+  int *thing;
+  thing = malloc(value*sizeof(int));
   printf("partitionPrime %d\n", value);
-
+  ppart(value, thing, 0);
+  free(thing);
 }
