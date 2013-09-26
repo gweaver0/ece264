@@ -74,7 +74,6 @@ int * readInteger(char * filename, int * numInteger)
   for(count = 0; count < *numInteger; count++)
     fscanf(fp, "%i", &ptr[count]);
   fclose(fp);
-  printf("read is sucessful!\n");
   if(ferror(fp)!=0)
     return NULL;
   return ptr;
@@ -150,11 +149,10 @@ char * * readString(char * filename, int * numString)
 {
   FILE *fp = fopen(filename, "r");
   int count = 0;
-  char ch;
   char** ptr;
-  while((ch = fgetc(fp)) != EOF)
-    if(ch == '\n')
-      count++;
+  char buf[MAXIMUM_LENGTH];
+  while(fgets(buf,MAXIMUM_LENGTH, fp) !=NULL)
+    count++;
   *numString = count;
   ptr = malloc(sizeof(char*) * (*numString));
   for(count =0; count < *numString; count++)
@@ -163,7 +161,6 @@ char * * readString(char * filename, int * numString)
   for(count = 0; count < *numString; count++)
     fgets(ptr[count], MAXIMUM_LENGTH, fp);
   fclose(fp);
-  printf("read is sucessful!\n");
   if(ferror(fp)!=0)
     return NULL;
   return ptr;
@@ -268,7 +265,14 @@ int saveInteger(char * filename, int * arrInteger, int numInteger)
 
 int saveString(char * filename, char * * arrString, int numString)
 {
-  return 0;
+  FILE *fp = fopen(filename, "w");
+  int count = 0;
+  for(count = 0; count < numString; count++)
+    fprintf(fp, "%s", arrString[count]);
+  fclose(fp);
+  if(ferror(fp)!=0)
+    return 0;
+  return 1;
 }
 
 /* ----------------------------------------------- */
@@ -301,9 +305,14 @@ void sortInteger(int * arrInteger, int numInteger)
  *
  */
 
+int cmpstr(const void *p1, const void  *p2)
+{
+  return strcmp(* (char * const *) p1, * (char * const *) p2);
+}
 
 void sortString(char * * arrString, int numString)
 {
+  qsort(arrString, numString, sizeof(arrString[0]), cmpstr);
 }
 
 
