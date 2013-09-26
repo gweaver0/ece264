@@ -148,7 +148,26 @@ int * readInteger(char * filename, int * numInteger)
 
 char * * readString(char * filename, int * numString)
 {
-  return NULL;
+  FILE *fp = fopen(filename, "r");
+  int count = 0;
+  char ch;
+  char** ptr;
+  while((ch = fgetc(fp)) != EOF)
+    if(ch == '\n')
+      count++;
+  *numString = count;
+  ptr = malloc(sizeof(char*) * (*numString));
+  for(count =0; count < *numString; count++)
+    ptr[count] = malloc(sizeof(char)*MAXIMUM_LENGTH);
+  fseek(fp, 0, SEEK_SET);
+  for(count = 0; count < *numString; count++)
+    fgets(ptr[count], MAXIMUM_LENGTH, fp);
+  fclose(fp);
+  printf("read is sucessful!\n");
+  if(ferror(fp)!=0)
+    return NULL;
+  return ptr;
+  
 }
 
 /* ----------------------------------------------- */
@@ -159,7 +178,7 @@ void printInteger(int * arrInteger, int numInteger)
 {
   int count;
   for(count = 0; count <numInteger; count++)
-    printf("%i \n", arrInteger[count]);
+    printf("%i\n", arrInteger[count]);
 }
 
 /* ----------------------------------------------- */
@@ -170,6 +189,10 @@ void printInteger(int * arrInteger, int numInteger)
  */
 void printString(char * * arrString, int numString)
 {
+  int count;
+  for(count = 0; count <numString; count++)
+    printf("%s\n", arrString[count]);
+
 }
 
 /* ----------------------------------------------- */
@@ -189,6 +212,10 @@ void freeInteger(int * arrInteger, int numInteger)
  */
 void freeString(char * * arrString, int numString)
 {
+  int count;
+  for(count = 0; count <numString; count++)
+    free(arrString[count]);
+  free(arrString);
 }
 
 /* ----------------------------------------------- */
