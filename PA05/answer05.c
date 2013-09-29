@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pa05.h"
-#define MAXIMUM_LENGTH 80
 
 /*
  * Read a file of integers.
@@ -74,8 +73,6 @@ int * readInteger(char * filename, int * numInteger)
   for(count = 0; count < *numInteger; count++)
     fscanf(fp, "%i", &ptr[count]);
   fclose(fp);
-  if(ferror(fp)!=0)
-    return NULL;
   return ptr;
 }
 
@@ -148,8 +145,8 @@ int * readInteger(char * filename, int * numInteger)
 char * * readString(char * filename, int * numString)
 {
   FILE *fp = fopen(filename, "r");
-  int count = 0;
-  char** ptr;
+  int count = 0, n;
+  char** ptr, c = '\n';
   char buf[MAXIMUM_LENGTH];
   while(fgets(buf,MAXIMUM_LENGTH, fp) !=NULL)
     count++;
@@ -159,10 +156,16 @@ char * * readString(char * filename, int * numString)
     ptr[count] = malloc(sizeof(char)*MAXIMUM_LENGTH);
   fseek(fp, 0, SEEK_SET);
   for(count = 0; count < *numString; count++)
+  {
     fgets(ptr[count], MAXIMUM_LENGTH, fp);
+    n = (int) strlen(ptr[count]);
+    if(ptr[count][n-1]!=c)
+    {
+      ptr[count][n] = c;
+      ptr[count][n+1] = '\0';
+    }
+  }
   fclose(fp);
-  if(ferror(fp)!=0)
-    return NULL;
   return ptr;
   
 }
@@ -187,7 +190,7 @@ void printInteger(int * arrInteger, int numInteger)
 void printString(char * * arrString, int numString)
 {
   int count;
-  for(count = 0; count <numString; count++)
+  for(count = 0; count < numString; count++)
     printf("%s\n", arrString[count]);
 
 }
@@ -240,8 +243,6 @@ int saveInteger(char * filename, int * arrInteger, int numInteger)
   for(count = 0; count < numInteger; count++)
     fprintf(fp, "%i\n", arrInteger[count]);
   fclose(fp);
-  if(ferror(fp)!=0)
-    return 0;
   return 1;
 }
 
@@ -270,8 +271,6 @@ int saveString(char * filename, char * * arrString, int numString)
   for(count = 0; count < numString; count++)
     fprintf(fp, "%s", arrString[count]);
   fclose(fp);
-  if(ferror(fp)!=0)
-    return 0;
   return 1;
 }
 
