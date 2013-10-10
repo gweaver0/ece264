@@ -205,9 +205,6 @@ struct Image * loadImage(const char* filename)
   headers = malloc(4*sizeof(int));
   if(fread(headers,4,4,fp)<4)
     return endexit(fp,headers); //step 2
-  for(i=0; i<4;i++)
-    printf("%i\n",headers[i]);
-  printf("%i\n",ECE264_IMAGE_MAGIC_BITS);
   if(headers[0]!=ECE264_IMAGE_MAGIC_BITS)
     return endexit(fp,headers); //step 3
   if(headers[1]<=0||headers[2]<=0)
@@ -217,20 +214,17 @@ struct Image * loadImage(const char* filename)
   if((comment = malloc((headers[3])*sizeof(char)))==NULL&&(headers[3]-1)>0)
     return endexit2(fp, headers,comment); //5&6
   fread(comment, sizeof(char), headers[3], fp); 
-  if(comment[headers[3]-2]!='\0')
+  if(comment[headers[3]-1]!='\0')
     return endexit2(fp, headers,comment);//7
-  printf("%s\n",comment);
   size = headers[1]*headers[2];
 
 
   pixels = malloc(size*sizeof(uint8_t)); //8
   if(fread(pixels, sizeof(uint8_t), size, fp)<size)
     return endexit3(fp, headers, comment, pixels); //9
-  for(i=0;i<size;i+=headers[2])
-    printf("%i, ",pixels[i]);
+
   if(fread(last,sizeof(uint8_t), 1, fp))
     return endexit3(fp, headers, comment, pixels); //10
-  printf("Exactly right amount was read!");
   if((img = malloc(sizeof(struct Image)))==NULL)
     return endexit3(fp, headers, comment, pixels);
   img -> width = headers[1];
@@ -241,6 +235,9 @@ struct Image * loadImage(const char* filename)
   for(i =0; i<size;i++)
     img -> data[i] = pixels[i];
   fclose(fp);
+  free(pixels);
+  free(headers);
+  free(comment);
   return img;
 }
 
@@ -257,9 +254,12 @@ struct Image * loadImage(const char* filename)
  */
 void freeImage(struct Image * image)
 {
+  if(image!=NULL)
+  {
   free(image -> comment);
   free(image -> data);
   free(image);
+  }
 }
 
 /*
@@ -288,7 +288,18 @@ void freeImage(struct Image * image)
  */
 void linearNormalization(struct Image * image)
 {
-
+  int i, max = image -> data[0], min = image -> data[0];
+  for(i =0; i < (image -> width)*(image -> height); i++)
+    {
+      if(image -> data[i]>max)
+        max = image -> data[i];
+      if(image -> data[i]<min)
+        min = image -> data[i];
+    }
+  for(i=0; i < (image -> width)*(image -> height); i++)
+    {
+      image -> data[i] = (image -> data[i] - min) * 255.0 / (max - min);
+    }
 }
 
 
