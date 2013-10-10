@@ -257,7 +257,9 @@ struct Image * loadImage(const char* filename)
  */
 void freeImage(struct Image * image)
 {
-
+  free(image -> comment);
+  free(image -> data);
+  free(image);
 }
 
 /*
