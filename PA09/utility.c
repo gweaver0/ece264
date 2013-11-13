@@ -9,7 +9,7 @@ HuffNode *makeTree(FILE *fp)
   char *code=NULL;
   int *bigcode=NULL;
   char ch=fgetc(fp);
-  int length = 0, i, j,k=0, biglength, done =0;
+  int length = 0, i, j,k=0, biglength, done =0, onecount = 0, zerocount =0, dontread =0;
   int myByte[8] = {0,0,0,0,0,0,0,0};
   HuffNode *templeft;
   HuffNode *tempright;
@@ -21,10 +21,26 @@ HuffNode *makeTree(FILE *fp)
   {
     printf("This is a binary file.\n");
     fseek(fp, 0, SEEK_SET);
-    while((ch=fgetc(fp))!='\n')
+    ch =fgetc(fp);
+    while(onecount>zerocount||length<2)
     {
       printf("%c", ch);
+      for(i =0; i<8;i++)
+      {
+        dontread--;
+        if(dontread<0)
+        {
+          if(getBit(ch,i)==1)
+          {
+            dontread = 8;
+            onecount++;
+          }
+          else
+            zerocount++;
+        }
+      }
       length++;
+      ch=fgetc(fp);
     }
     fseek(fp, 0, SEEK_SET);
     biglength = 8*length;
@@ -78,14 +94,21 @@ HuffNode *makeTree(FILE *fp)
   {
     printf("This is a character file.\n");
     fseek(fp, 0, SEEK_SET);
-    while((ch=fgetc(fp))!='\n')
-    {  
+    ch=fgetc(fp);
+    while(onecount>zerocount||length<2)
+    {
       printf("%c", ch);
       length++;
+      if(ch=='1')
+        onecount++;
+      if(ch=='0')
+        zerocount++;
+      ch=fgetc(fp);
     }
     fseek(fp, 0, SEEK_SET);
     code = malloc(sizeof(char)*length+1);
-    fgets(code, length, fp);
+    for(k=0; k<length; k++)
+     code[k]=fgetc(fp);
     code[length] = '\0';
     printf("\n%s\n",code);
   }
