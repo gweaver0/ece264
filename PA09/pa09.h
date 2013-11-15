@@ -13,7 +13,7 @@ typedef struct _stack {
 } Stack;
 
 HuffNode *makeTree(FILE *fp);
-void postOrderPrint(HuffNode *root, char *filename);
+void postOrderPrint(HuffNode *root, FILE *fp);
 void destroy(HuffNode *root);
 char ascii(int num[8]);
 int getBit(unsigned char myByte, int spot);
@@ -22,5 +22,4 @@ Stack *popStack(Stack *myStack);
 Stack *getTop(Stack *myStack);
 int lengthStack(Stack *myStack);
 HuffNode *makeNode(int value, HuffNode *left, HuffNode *right);
-void postOrderPrintHelp(HuffNode *root, FILE *fp);
 #endif

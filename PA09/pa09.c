@@ -20,7 +20,9 @@ int main(int argc, char **argv)
   }
   root = makeTree(fp);
   fclose(fp);
-  postOrderPrint(root, argv[2]);
+  fp = fopen(argv[2], "w");
+  postOrderPrint(root, fp);
+  fclose(fp);
   destroy(root);
   return EXIT_SUCCESS;  
 }

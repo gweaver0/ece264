@@ -17,10 +17,8 @@ HuffNode *makeTree(FILE *fp)
   HuffNode *mytree;
   mystack = malloc(sizeof(Stack));
   mystack -> next = NULL;
-  //mytree = malloc(sizeof(HuffNode));
   if(getBit(ch,0))
   {
-    printf("This is a binary file.\n");
     fseek(fp, 0, SEEK_SET);
     ch =fgetc(fp);
     while(onecount>zerocount||length<2)
@@ -91,7 +89,6 @@ HuffNode *makeTree(FILE *fp)
   }
   else
   {
-    printf("This is a character file.\n");
     fseek(fp, 0, SEEK_SET);
     ch=fgetc(fp);
     while(onecount>zerocount||length<2)
@@ -109,18 +106,15 @@ HuffNode *makeTree(FILE *fp)
      code[k]=fgetc(fp);
     code[length] = '\0';
   }
-  printf("\nThe code is: %s\n", code);
   k = 0;
   while(!done&&k<length)
   {
-    printf("\nThe size of the stack is: %i and then ", lengthStack(mystack));
     ch = code[k];
     k++;
     if(ch == '1')
     {
       mystack = pushStack(mystack, makeNode((int)(code[k]), NULL, NULL));
       k++;
-      printf("a node is said to be pushed to the stack");
     }
     else
     {
@@ -142,21 +136,13 @@ HuffNode *makeTree(FILE *fp)
       templeft = getTop(mystack)->node;
       mystack = popStack(mystack);
       mytree = makeNode(0,templeft,tempright);
-      printf("two trees have been popped from the stack and merged; stack size is %i", lengthStack(mystack));
       mystack = pushStack(mystack, mytree);
     }
   }
   free(code);
   return mytree;
 }
-void postOrderPrint(HuffNode *root,char *filename)
-{
-  FILE *fp;
-  fp = fopen(filename, "w");
-  postOrderPrintHelp(root,fp);
-  fclose(fp);
-}
-void postOrderPrintHelp(HuffNode *root, FILE* fp)
+void postOrderPrint(HuffNode *root, FILE* fp)
 {
   // Base case: empty subtree
 
@@ -167,11 +153,11 @@ void postOrderPrintHelp(HuffNode *root, FILE* fp)
     // Visit left
 
   fprintf(fp,"Left\n");
-  postOrderPrintHelp(root->left, fp);
+  postOrderPrint(root->left, fp);
   fprintf(fp,"Back\n");
     // Visit right
   fprintf(fp,"Right\n");
-  postOrderPrintHelp(root->right,fp);
+  postOrderPrint(root->right,fp);
   fprintf(fp,"Back\n");
   // Visit node itself (only if leaf)
   if (root->left == NULL && root->right == NULL)
@@ -189,7 +175,7 @@ void destroy(HuffNode *root)
 }
 char ascii(int num[8])
 {
-  return (128*num[0]+64*num[1]+32*num[2]+16*num[3]+8*num[4]+4*num[5]+2*num[6]+num[7]);
+  return (128*num[0]+64*num[1]+32*num[2]+16*num[3]+8*num[4]+4*num[5]+2*num[6]+num[7]);//standard conversion of binary to decimal;
 }
 int getBit(unsigned char myByte, int spot)
 {
@@ -201,9 +187,7 @@ Stack *pushStack(Stack *myStack, HuffNode *root)
 {
   Stack *mynext;
   mynext = malloc(sizeof(Stack));
-  //mynext -> next = malloc(sizeof(Stack));
   mynext -> next = myStack;
-  //mynext -> node = malloc(sizeof(HuffNode));
   mynext -> node = root;
   return mynext;
 }
@@ -245,8 +229,6 @@ HuffNode *makeNode(int value, HuffNode *left, HuffNode * right)
   HuffNode *node;
   node = malloc(sizeof(HuffNode));
   node -> value = value;
-  //node -> left = malloc(sizeof(HuffNode));
-  //node -> right = malloc(sizeof(HuffNode));
   node ->left = left;
   node ->right = right;
   return node;
