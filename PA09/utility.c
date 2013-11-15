@@ -24,7 +24,6 @@ HuffNode *makeTree(FILE *fp)
     ch =fgetc(fp);
     while(onecount>zerocount||length<2)
     {
-      printf("%c", ch);
       for(i =0; i<8;i++)
       {
         dontread--;
@@ -88,7 +87,6 @@ HuffNode *makeTree(FILE *fp)
     }
     free(bigcode);
     code[length]='\0';
-    printf("\n%s\n",code);
   }
   else
   {
@@ -97,7 +95,6 @@ HuffNode *makeTree(FILE *fp)
     ch=fgetc(fp);
     while(onecount>zerocount||length<2)
     {
-      printf("%c", ch);
       length++;
       if(ch=='1')
         onecount++;
@@ -110,34 +107,34 @@ HuffNode *makeTree(FILE *fp)
     for(k=0; k<length; k++)
      code[k]=fgetc(fp);
     code[length] = '\0';
-    printf("\n%s\n",code);
   }
+  printf("\nThe code is: %s\n", code);
   k = 0;
   while(!done&&k<length)
   {
+    printf("\nThe size of the stack is: %i and then ", lengthStack(mystack));
     ch = code[k];
     k++;
     if(ch == '1')
     {
       mystack = pushStack(mystack, makeNode((int)(code[k]), NULL, NULL));
       k++;
+      printf("a node is said to be pushed to the stack");
     }
     else
     {
-      if(lengthStack(mystack)<2)
+      if(lengthStack(mystack)==1)
       {
-        printf("Invalid specs for Huffman tree.\n");
-        return NULL;
-      }
-      tempright = getLast(mystack);
-      popStack(mystack);
-      templeft = getLast(mystack);
-      popStack(mystack);
-      mytree = makeNode(0,templeft,tempright);
-      if(lengthStack(mystack)==0)
         done = 1;
-      else
-        mystack = pushStack(mystack, mytree);
+        return mytree;
+      }
+      tempright = getTop(mystack)->node;
+      mystack = popStack(mystack);
+      templeft = getTop(mystack)->node;
+      mystack = popStack(mystack);
+      mytree = makeNode(0,templeft,tempright);
+      printf("two trees have been popped from the stack and merged; stack size is %i", lengthStack(mystack));
+      mystack = pushStack(mystack, mytree);
     }
   }
   return mytree;
@@ -168,42 +165,35 @@ int getBit(unsigned char myByte, int spot)
 Stack *pushStack(Stack *myStack, HuffNode *root)
 {
   Stack *mynext;
-  Stack  *temp;
-  temp = myStack;
   mynext = malloc(sizeof(Stack));
   mynext -> next = malloc(sizeof(Stack));
-  mynext -> next = NULL;
+  mynext -> next = myStack;
   mynext -> node = malloc(sizeof(HuffNode));
   mynext -> node = root;
-  while(temp!=NULL)
-    temp = temp->next;
-  temp = mynext;
+  return mynext;
+}
+Stack *popStack(Stack *myStack)
+{
+  Stack *temp;
+  temp = myStack;
+  if(myStack==NULL)
+    return NULL;
+  if(myStack->next == NULL)
+    {
+      free(myStack);
+      return NULL;
+    }
+  temp = myStack->next;
+  free(myStack);
+  return temp; 
+}
+Stack *getTop(Stack *myStack)
+{
   return myStack;
-}
-void popStack(Stack *myStack)
-{
-  Stack *temp = myStack;
-  if(temp==NULL)
-  {
-    free(temp);
-    return;
-  }
-  while(temp->next!=NULL)
-    temp = temp->next;
-  free(temp); 
-}
-HuffNode *getLast(Stack *myStack)
-{
-  Stack *temp = myStack;
-  if(temp->next == NULL)
-    return myStack->node;
-  while(temp->next!=NULL)
-    temp = temp->next;
-  return temp->node;
 }
 int lengthStack(Stack *myStack)
 {
-  int length = 0;
+  int length = -1;
   Stack *curr;
   curr = myStack;
   if(myStack ==NULL)
