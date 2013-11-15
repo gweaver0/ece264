@@ -12,15 +12,15 @@ typedef struct _stack {
     HuffNode * node;
 } Stack;
 
-const unsigned char identityer = 0x80; //byte made of leading 1 following by 7 zeroes
 HuffNode *makeTree(FILE *fp);
 void postOrderPrint(HuffNode *root, char *filename);
 void destroy(HuffNode *root);
 char ascii(int num[8]);
 int getBit(unsigned char myByte, int spot);
 Stack *pushStack(Stack *myStack, HuffNode *root);
-void popStack(Stack *myStack);
+Stack *popStack(Stack *myStack);
+Stack *getTop(Stack *myStack);
 int lengthStack(Stack *myStack);
 HuffNode *makeNode(int value, HuffNode *left, HuffNode *right);
-HuffNode *getLast(Stack *myStack);
+void postOrderPrintHelp(HuffNode *root, FILE *fp);
 #endif

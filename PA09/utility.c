@@ -16,7 +16,8 @@ HuffNode *makeTree(FILE *fp)
   Stack *mystack;
   HuffNode *mytree;
   mystack = malloc(sizeof(Stack));
-  mytree = malloc(sizeof(HuffNode));
+  mystack -> next = NULL;
+  //mytree = malloc(sizeof(HuffNode));
   if(getBit(ch,0))
   {
     printf("This is a binary file.\n");
@@ -126,6 +127,14 @@ HuffNode *makeTree(FILE *fp)
       if(lengthStack(mystack)==1)
       {
         done = 1;
+        if(mystack->next!=NULL)
+          {
+            if(mystack->next->next!=NULL)
+              free(mystack->next->next);
+            free(mystack->next);
+          }
+        free(mystack);
+        free(code);
         return mytree;
       }
       tempright = getTop(mystack)->node;
@@ -137,11 +146,36 @@ HuffNode *makeTree(FILE *fp)
       mystack = pushStack(mystack, mytree);
     }
   }
+  free(code);
   return mytree;
 }
-void postOrderPrint(HuffNode *root, char *filename)
+void postOrderPrint(HuffNode *root,char *filename)
 {
-  return;
+  FILE *fp;
+  fp = fopen(filename, "w");
+  postOrderPrintHelp(root,fp);
+  fclose(fp);
+}
+void postOrderPrintHelp(HuffNode *root, FILE* fp)
+{
+  // Base case: empty subtree
+
+  if (root == NULL) 
+    return;
+
+    // Recursive case: post-order traversal
+    // Visit left
+
+  fprintf(fp,"Left\n");
+  postOrderPrintHelp(root->left, fp);
+  fprintf(fp,"Back\n");
+    // Visit right
+  fprintf(fp,"Right\n");
+  postOrderPrintHelp(root->right,fp);
+  fprintf(fp,"Back\n");
+  // Visit node itself (only if leaf)
+  if (root->left == NULL && root->right == NULL)
+    fprintf(fp,"Leaf: %c\n", root->value);
 }
 void destroy(HuffNode *root)
 {
@@ -159,6 +193,7 @@ char ascii(int num[8])
 }
 int getBit(unsigned char myByte, int spot)
 {
+  const unsigned char identityer = 0x80; //byte made of leading 1 following by 7 zeroes
   unsigned char mask=identityer>>spot;
   return ((myByte&mask)==mask);
 }
@@ -166,9 +201,9 @@ Stack *pushStack(Stack *myStack, HuffNode *root)
 {
   Stack *mynext;
   mynext = malloc(sizeof(Stack));
-  mynext -> next = malloc(sizeof(Stack));
+  //mynext -> next = malloc(sizeof(Stack));
   mynext -> next = myStack;
-  mynext -> node = malloc(sizeof(HuffNode));
+  //mynext -> node = malloc(sizeof(HuffNode));
   mynext -> node = root;
   return mynext;
 }
@@ -210,8 +245,8 @@ HuffNode *makeNode(int value, HuffNode *left, HuffNode * right)
   HuffNode *node;
   node = malloc(sizeof(HuffNode));
   node -> value = value;
-  node -> left = malloc(sizeof(HuffNode));
-  node -> right = malloc(sizeof(HuffNode));
+  //node -> left = malloc(sizeof(HuffNode));
+  //node -> right = malloc(sizeof(HuffNode));
   node ->left = left;
   node ->right = right;
   return node;
