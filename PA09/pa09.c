@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pa09.h"
+#include "utility.c"
 
 int main(int argc, char **argv)
 {
