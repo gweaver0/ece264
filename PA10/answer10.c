@@ -237,9 +237,38 @@ int isStackSortable(int * array, int len)
  * The correct outputs for sizes [1..9] are in the 'expected' 
  * directory.
  */
+void permute(int *arr, int ind, int len)
+{
+  int i, temp, j;
+  if(ind==len)
+  {
+    for(j = 0; j< len; j++)
+      printf("%i", arr[j]);
+    printf("spot1\n");
+    return;
+  }
+  else
+  {
+    for(i = ind; i<len; i++)
+    {
+      temp = arr[i];
+      arr[i] = arr[ind];
+      arr[ind] = temp;
+      permute(arr, ind + 1, len);
+      temp = arr[i];
+      arr[i] = arr[ind];
+      arr[ind] = temp;
+    }
+  }
+}
 void genShapes(int k)
 {
-
+  int i;
+  int *arr;
+  arr = malloc(k*sizeof(int));
+  for(i=0; i<k;i++)
+    arr[i] = i;
+  permute(arr, 0, k);
 }
 
 
