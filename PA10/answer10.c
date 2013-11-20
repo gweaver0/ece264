@@ -148,9 +148,78 @@ void stackSort(int * array, int len)
  * sequence in the sortable files, and you must return FALSE for every
  * sequence in the unsortable files.
  */
+int inrange(int thing, int len)
+{
+  return (thing>0&&thing<len);
+}
+int isStackSortableHelp3(int *array, int len)
+{
+  int flag, i, j;
+  for(i=0; i< len; i++)
+    for(j=0; j<len; j++)    
+      array[i]+=array[j];
+  for(i=0; i<len;i++)
+    if(array[i]<0)
+      flag = FALSE;
+  return flag;
+}
+int isStackSortableHelp2(int *array, int len)
+{
+  int i, flag = TRUE;
+  stackSort(array, len);
+  for(i = 0; i< len - 1; i++)
+    if(array[i]>array[i+1])
+      flag = FALSE;
+  return flag;
+}
+int isStackSortableHelp(int * array, int bottom, int top, int len, int flag)
+{
+  int maxindex, max, i, min, maxindexA, minindex;
+  return isStackSortableHelp2(array, len);
+  if(inrange(bottom, len)&&inrange(top, len)&&bottom<=top)
+  {
+    maxindex = bottom;
+    max = array[bottom];
+    for(i=bottom; i<=top; i++)
+    {
+      if(array[i]>max)
+      {
+        max = array[i];
+        maxindex = i;
+      }
+    }
+    maxindexA = bottom;
+    max = array[bottom];
+    for(i=bottom; i<=maxindex-1; i++)            
+    { 
+      if(array[i]>max)
+      {
+        max = array[i];
+        maxindexA = i;
+      }
+    } 
+    minindex = maxindex + 1;
+    min = array[maxindex + 1];
+    for(i=maxindex +1; i<=top; i++)
+    {
+      if(array[i]<min)
+      {
+        min = array[i];
+        minindex = i;
+      }
+    }
+    if(max > min)
+      flag = FALSE;
+    return flag;
+    flag = isStackSortableHelp(array, bottom, maxindex -1, len, flag);
+    flag = isStackSortableHelp(array, maxindex+1, top, len, flag);
+    return flag;
+  }
+  return flag;
+}
 int isStackSortable(int * array, int len)
 {
-    return FALSE;
+  return isStackSortableHelp(array, 0, len - 1, len, TRUE);
 }
 
 /**
