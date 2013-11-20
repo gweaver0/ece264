@@ -278,6 +278,7 @@ void genShapes(int k)
   for(i=0; i<k;i++)
     arr[i] = i;
   permute(arr, 0, k);
+  free(arr);
 }
 
 
