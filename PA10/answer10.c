@@ -166,10 +166,15 @@ int isStackSortableHelp3(int *array, int len)
 int isStackSortableHelp2(int *array, int len)
 {
   int i, flag = TRUE;
-  stackSort(array, len);
+  int *copy;
+  copy = malloc(len*sizeof(int));
+  for(i =0; i <len; i++)
+    copy[i] = array[i];
+  stackSort(copy, len);
   for(i = 0; i< len - 1; i++)
-    if(array[i]>array[i+1])
+    if(copy[i]>copy[i+1])
       flag = FALSE;
+  free(copy);
   return flag;
 }
 int isStackSortableHelp(int * array, int bottom, int top, int len, int flag)
@@ -239,12 +244,16 @@ int isStackSortable(int * array, int len)
  */
 void permute(int *arr, int ind, int len)
 {
-  int i, temp, j;
+  TreeNode *tree;
+  int i, temp;
   if(ind==len)
   {
-    for(j = 0; j< len; j++)
-      printf("%i", arr[j]);
-    printf("spot1\n");
+    if(isStackSortable(arr, len))
+    {
+      tree = Tree_build(arr, len);
+      Tree_printShape(tree);
+      Tree_destroy(tree);
+    }
     return;
   }
   else
