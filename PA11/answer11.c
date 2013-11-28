@@ -126,8 +126,43 @@ void printPuzzle(const char * state)
  * (5) Swap the characters at 'position' and 'target_position'
  */
 int move(char * state, char m)
-{    
-    return TRUE;
+{
+  int row, col, new_row, new_col, position = 0, target_position, i;
+  char temp;
+  for(i = 0; i<strlen(state); i++)
+  {
+    if(state[i] == '-')
+      position = i;
+  }
+  row = position / SIDELENGTH;
+  col = position % SIDELENGTH;
+  if(m == 'U')
+  {
+    new_row = row - 1;
+    new_col = col;
+  }
+  else if(m == 'D')
+  { 
+    new_row = row + 1;
+    new_col = col;
+  }
+  else if(m == 'R')
+  { 
+    new_row = row;
+    new_col = col + 1;
+  }
+  else
+  { 
+    new_row = row;
+    new_col = col - 1;
+  }
+  if(new_row<0||new_col<0||new_row>=SIDELENGTH||new_col>=SIDELENGTH)
+    return FALSE;
+  target_position = new_row * SIDELENGTH + new_col;
+  temp = state[position];
+  state[position] = state[target_position];
+  state[target_position] = temp;
+  return TRUE;
 }
 
 /**
@@ -145,7 +180,14 @@ int move(char * state, char m)
  */
 void processMoveList(char * state, const char * movelist)
 {
-
+  int i, valid;
+  for(i = 0; i < strlen(movelist); i++)
+    if(!move(state, movelist[i]))
+      valid = FALSE;
+  if(valid)
+    printf("%s\n", state);
+  else
+    printf("I\n");
 }
 
 /**
