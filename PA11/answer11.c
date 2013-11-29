@@ -59,7 +59,7 @@ int isValidState(const char * state)
   int i=0, valid;
   char *copy;
   copy = malloc(strlen(state)+1);
-  for(i = 0; i < strlen(state); i++)
+  for(i = 0; i <= strlen(state); i++)
     copy[i] = state[i];
   qsort(copy, strlen(copy), sizeof(char), compare);
   if(!strcmp(copy, "-123456789ABCDEF"))
@@ -195,7 +195,18 @@ void processMoveList(char * state, const char * movelist)
  */
 MoveTree * MoveTree_create(const char * state, const char * moves)
 {
-    return NULL;
+  MoveTree *newtree;
+  int i;
+  newtree = malloc(sizeof(MoveTree));
+  newtree -> state = malloc((strlen(state)+1)*sizeof(char));
+  newtree -> moves = malloc((strlen(moves)+1)*sizeof(char));
+  for(i = 0; i <= strlen(state); i++)
+    newtree-> state[i] = state[i];
+  for(i = 0; i <= strlen(moves); i++)
+    newtree-> moves[i] = moves[i];
+  newtree -> left = NULL;
+  newtree -> right = NULL;
+  return newtree;
 }
 
 /**
@@ -203,7 +214,15 @@ MoveTree * MoveTree_create(const char * state, const char * moves)
  */
 void MoveTree_destroy(MoveTree * node)
 {
-    
+  if(node == NULL)
+   return;
+  if(node -> state!= NULL)
+   free(node->state);
+  if(node -> moves != NULL)
+   free(node->moves);
+  MoveTree_destroy(node-> left);
+  MoveTree_destroy(node ->right);
+  free(node);
 }
 
 /**
@@ -215,7 +234,26 @@ void MoveTree_destroy(MoveTree * node)
 MoveTree * MoveTree_insert(MoveTree * node, const char * state,
 			   const char * moves)
 {
-    return NULL;
+  int i;
+  if(node==NULL)
+    return MoveTree_create(state, moves);
+  if(strcmp(state, node -> state)==0)
+  {
+    if(strlen(moves)<strlen(node->moves))
+    {
+      free(node->moves);
+      node -> moves = malloc((strlen(moves)+1)*sizeof(char));
+      for(i = 0; i <= strlen(moves); i++)
+        node -> moves[i] = moves[i];
+    }
+  }
+  else if(strcmp(state, node -> state) < 0)
+  {
+    node -> left = MoveTree_insert(node -> left, state, moves);
+  }
+  else
+    node -> right = MoveTree_insert(node -> right, state, moves);
+  return node;
 }
 
 /**
@@ -224,7 +262,18 @@ MoveTree * MoveTree_insert(MoveTree * node, const char * state,
  */
 MoveTree * MoveTree_find(MoveTree * node, const char * state)
 {
-  return NULL;  
+  if(node == NULL)
+    return NULL;
+  else if(strcmp(state, node -> state)==0)
+  {
+    return node;
+  }
+  else if(strcmp(state, node -> state) < 0)
+  {
+    return MoveTree_find(node -> left, state);
+  }
+  else
+    return MoveTree_find(node -> right, state);
 }
 
 /**
@@ -288,9 +337,38 @@ void MoveTree_print(MoveTree * node)
  * This is the most complex function to write... make sure you break
  * it down, and TEST EACH PART.
  */
+void generateAllHelper(MoveTree * root, int n_moves, const char * state, char* movelist, int ind)
+{
+  char direc[4] = "UDLR";
+  char *dup_state;
+  int i, j;
+  if(ind == n_moves)
+    return;
+  for(i = 0; i < 4; i++)
+  {
+    dup_state = malloc(sizeof(char)*(strlen(state)+1));
+    for(j =0; j<= strlen(state); j++)
+      dup_state[j] = state[j];
+    if(move(dup_state, direc[i]))
+    {
+      movelist[ind] = direc[i];
+      movelist[ind+1] = '\0';
+      printf("putting in tree: %s\n", dup_state);
+      MoveTree_insert(root, dup_state, movelist);
+      generateAllHelper(root, n_moves, dup_state, movelist, ind + 1);
+    }
+    free(dup_state);
+  }
+}
 MoveTree * generateAll(char * state, int n_moves)
 { 
-    return NULL;
+  char *movelist;
+  MoveTree* tree;
+  movelist = malloc(sizeof(char)*(n_moves+1));
+  movelist[0] = '\0';
+  tree = MoveTree_create(state, movelist);
+  generateAllHelper(tree, n_moves, state, movelist, 0);
+  return tree;
 }
 
 /**
