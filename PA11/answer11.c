@@ -353,7 +353,6 @@ void generateAllHelper(MoveTree * root, int n_moves, const char * state, char* m
     {
       movelist[ind] = direc[i];
       movelist[ind+1] = '\0';
-      printf("putting in tree: %s\n", dup_state);
       MoveTree_insert(root, dup_state, movelist);
       generateAllHelper(root, n_moves, dup_state, movelist, ind + 1);
     }
@@ -380,6 +379,12 @@ MoveTree * generateAll(char * state, int n_moves)
  */
 char * solve(char * state)
 {
+  MoveTree *root;
+  MoveTree *found;
+  root = generateAll(state, MAX_SEARCH_DEPTH);
+  found = MoveTree_find(root, FINAL_STATE);
+  if(found==NULL)
     return NULL;
+  else
+    return found -> moves;
 }
-
