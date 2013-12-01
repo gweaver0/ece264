@@ -180,7 +180,7 @@ int move(char * state, char m)
  */
 void processMoveList(char * state, const char * movelist)
 {
-  int i, valid;
+  int i, valid = TRUE;
   for(i = 0; i < strlen(movelist); i++)
     if(!move(state, movelist[i]))
       valid = FALSE;
@@ -367,6 +367,7 @@ MoveTree * generateAll(char * state, int n_moves)
   movelist[0] = '\0';
   tree = MoveTree_create(state, movelist);
   generateAllHelper(tree, n_moves, state, movelist, 0);
+  free(movelist);
   return tree;
 }
 
@@ -381,10 +382,18 @@ char * solve(char * state)
 {
   MoveTree *root;
   MoveTree *found;
+  char *ret;
+  int i;
   root = generateAll(state, MAX_SEARCH_DEPTH);
   found = MoveTree_find(root, FINAL_STATE);
-  if(found==NULL)
-    return NULL;
+  if(found!=NULL)
+  {
+    ret = malloc(sizeof(char)*(strlen(found->moves)+1));
+    for(i=0;i<=strlen(found->moves); i++)
+      ret[i] = found->moves[i];
+  }
   else
-    return found -> moves;
+    ret = NULL;
+  MoveTree_destroy(root);
+  return ret;
 }
